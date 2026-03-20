@@ -9,7 +9,7 @@ A simple command-line tool that converts unstructured text into a structured sum
 * Accepts input via:
 
   * File path
-  * Direct stdin (paste input)
+  * Interactive CLI input
 * Generates structured output:
 
   * One-sentence summary
@@ -68,35 +68,56 @@ OPENAI_API_KEY=your_api_key_here
 
 ---
 
-## 🔑 How to Get an API Key
+## 🔑 API Setup
 
-### Option 1: OpenAI (Paid)
+### Option 1: OpenRouter (Used in this project) ✅
 
-1. Visit: https://platform.openai.com/
-2. Create an account
-3. Generate an API key (`sk-...`)
-4. Add billing (required)
+* Free tier available
+* Model availability may change over time
 
----
-
-### Option 2: OpenRouter (Free Tier Available) ✅
-
-1. Visit: https://openrouter.ai/
-2. Sign up and log in
-3. Generate an API key (`sk-or-v1-...`)
-4. Add it to your `.env`
-
-This project uses OpenRouter with:
+Configuration used:
 
 ```js
 baseURL: "https://openrouter.ai/api/v1"
+model: "meta-llama/llama-3-8b-instruct:free"
 ```
+
+---
+
+### Option 2: OpenAI (Alternative)
+
+* Requires billing
+* API key format: `sk-...`
+
+---
+
+### ⚠️ Note on Model Selection
+
+OpenRouter free models may change availability. During development, some models returned `404` errors.
+
+To ensure reliability, the application uses:
+
+* `meta-llama/llama-3-8b-instruct:free`
 
 ---
 
 ## ▶️ Usage
 
-### Run with file input
+### Interactive CLI input (Recommended)
+
+```bash
+node index.js
+```
+
+Then enter your text:
+
+```
+📥 Enter your text: AI is transforming industries...
+```
+
+---
+
+### File input
 
 ```bash
 node index.js sample.txt
@@ -104,26 +125,13 @@ node index.js sample.txt
 
 ---
 
-### Run with stdin input
-
-```bash
-node index.js
-```
-
-Paste your text and finish input:
-
-* Windows → `Ctrl + Z` then `Enter`
-* Mac/Linux → `Ctrl + D`
-
----
-
 ## 🧠 Prompt Design
 
-The prompt is designed to enforce structured output:
+The prompt is designed to enforce strict structured output:
 
 * Explicit JSON schema
 * Instruction to return only JSON
-* Strict requirement of exactly 3 key points
+* Exactly 3 key points enforced
 * Low temperature (0.3) for consistency
 
 ### Example Prompt
@@ -144,12 +152,12 @@ Text:
 
 ## ⚙️ How It Works
 
-1. Reads input from file or stdin
+1. Accepts input from CLI or file
 2. Sends text to LLM API
-3. Uses prompt to enforce structured JSON output
+3. Uses structured prompt to enforce JSON output
 4. Parses response safely
 5. Applies fallback logic if output is inconsistent
-6. Prints formatted results to the terminal
+6. Prints formatted results
 
 ---
 
@@ -186,62 +194,61 @@ POSITIVE
 ### 2. Incorrect API Key (401)
 
 * **Issue:** Used OpenRouter key with OpenAI endpoint
-* **Solution:** Updated `baseURL` to OpenRouter API
+* **Solution:** Updated `baseURL` configuration
 
 ---
 
 ### 3. Model Not Found (404)
 
-* **Issue:** Some models unavailable
-* **Solution:** Switched to supported models like:
-
-  * `mistralai/mistral-7b-instruct:free`
-  * `meta-llama/llama-3-8b-instruct:free`
+* **Issue:** Some OpenRouter models unavailable
+* **Solution:** Switched to a stable supported model
+  (`meta-llama/llama-3-8b-instruct:free`)
 
 ---
 
-### 4. Inconsistent Model Output
+### 4. Inconsistent Output
 
-* **Issue:** Sometimes returned fewer than 3 key points
+* **Issue:** Less than 3 key points returned
 * **Solution:** Added fallback logic to enforce exactly 3 points
 
 ---
 
 ### 5. JSON Parsing Errors
 
-* **Issue:** Model occasionally returns invalid JSON
-* **Solution:** Implemented try-catch error handling
+* **Issue:** Invalid JSON responses
+* **Solution:** Implemented try-catch handling
 
 ---
 
 ## ⚖️ Trade-offs
 
-* No schema validation library (kept lightweight)
+* Used CLI instead of web UI to keep solution simple
+* No schema validation (kept lightweight)
 * No retry mechanism for failed responses
-* Relies on prompt engineering for structured output
+* Focused on prompt reliability over UI complexity
 
 ---
 
 ## 🔮 Future Improvements
 
-* Add schema validation (e.g., Zod)
-* Retry logic for invalid responses
-* Batch processing of multiple files
-* Confidence scoring for outputs
-* CLI flags for customization
+* Add React frontend
+* Add schema validation (Zod)
+* Retry logic for malformed responses
+* Batch file processing
+* Confidence scoring
 
 ---
 
 ## 🔐 Security
 
-* `.env` is excluded via `.gitignore`
-* API keys are not committed to the repository
+* `.env` is ignored via `.gitignore`
+* API keys are not exposed in the repository
 
 ---
 
 ## 🏁 Conclusion
 
 This project focuses on simplicity, clarity, and effective LLM integration.
-It demonstrates structured prompt design, CLI development, and handling real-world API issues.
+It demonstrates structured prompt design, CLI usability, and handling real-world API challenges.
 
 ---
